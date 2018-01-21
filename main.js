@@ -137,6 +137,12 @@ async function computePrices(data) {
 
                     }
                 }
+				/*console.log("filtering before size: " + results.length);
+				console.log("filtering hgfdhgfdhgfd size: " + JSON.stringify(results[0]));
+				
+				results = results.filter(a => a['spread'] < 0.9 && a['spread'] > 0)
+				console.log("filtering AFTERRRR size: " + JSON.stringify(results[0]));
+				console.log("filtering after size: " + results.length);*/
                 results.sort(function (a, b) {
                     return a.spread - b.spread;
                 });
@@ -153,6 +159,19 @@ async function computePrices(data) {
     io.emit('results', results);
 }
 
+function bla() {
+	const crypto = require('crypto');
+const hmac = crypto.createHmac('sha256', 'a secret');
+
+hmac.on('readable', () => {
+  const data = hmac.read();
+  if (data) {
+    console.log(data.toString('hex'));
+    // Prints:
+    //   7fd04df92f636fd450bc841c9418e5825c17f33ad9c87c518115a45971f7f77e
+  }
+});
+}
 
 (async function main() {
     let arrayOfRequests = [];
@@ -160,7 +179,9 @@ async function computePrices(data) {
     for (let i = 0; i < markets.length; i++) {
         arrayOfRequests.push(getMarketData(markets[i], coin_prices));
     }
-
+	
+	
+	
     await Promise.all(arrayOfRequests.map(p => p.catch(e => e)))
 
         .then(results => computePrices(coin_prices))
