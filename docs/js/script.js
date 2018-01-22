@@ -4,10 +4,6 @@ function history(coin1, coin2) {
     alert('History graphs coming soon', coin1, coin2);
 }
 
-
-
-alert("Needs to be run locally.");
-
 let checkedMarkets = {
         showAll: true,
         bittrex: true,
@@ -28,7 +24,7 @@ function addRemoveAll(coinsOrMarkets) {
 
         for (let market in checkedMarkets) {
             checkedMarkets[market] = !checkedMarkets.showAll;
-            console.log(checkedMarkets[market]);
+            console.log('checkedMarkets[market]='+checkedMarkets[market]);
             addOne = false;
             addRemoveMarket(market);
             addOne = true;
@@ -41,7 +37,7 @@ function addRemoveAll(coinsOrMarkets) {
 
         for (let coin in checkedCoins) {
             checkedCoins[coin] = !checkedCoins.showAll;
-            console.log(checkedCoins[coin]);
+            console.log('checkedCoins[coin]='+checkedCoins[coin]);
             addOne = false;
             addRemoveCoin(coin)
             addOne = true;

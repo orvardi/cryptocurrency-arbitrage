@@ -83,7 +83,6 @@ let markets = [
                     console.log(err);
                     rej(err);
                 }
-
             })
         },
 
@@ -120,6 +119,7 @@ let markets = [
         URL: 'https://api.binance.com/api/v1/ticker/allPrices',
         toBTCURL: false,
         pairURL : '',
+        blacklist : ['<CoinName>'],
         last: function (data, coin_prices) { //Where to find the last price of coin in JSON data
             return new Promise(function (res, rej) {
                 try {
@@ -138,10 +138,8 @@ let markets = [
                     console.log(err);
                     rej(err);
                 }
-
             })
         },
-
     },
 	{
         marketName: 'bitgrail',
