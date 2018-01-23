@@ -1,78 +1,18 @@
-//
-// let boilerPlateMarket =
-// {
-//     marketName: '',
-//     URL: '', //URL To Fetch API From.
-//     toBTCURL: false, //URL, if needed for an external bitcoin price api.
-//     last: function (data, coin_prices) { //Get the last price of coins in JSON data
-//         return new Promise(function (res, rej) {
-//             try {
-//                 for (x in / of data) {
-//                     price = ...;
-//                     coin_prices[coinName][marketName] = price;
-//                 }
-//                 res(coin_prices);
-//             }
-//             catch (err) {
-//                 rej(err);
-//             }
-//
-//         })
-//     },
-//
-//
-// }
-
 let markets = [
-
-    // {
-    //     marketName: 'cryptowatchAPI',
-    //     URL: 'https://api.cryptowat.ch/markets/summaries', //URL To Fetch API From.
-    //     toBTCURL: false, //URL, if needed for an external bitcoin price api.
-    //
-    //     last: function (data, coin_prices, toBTCURL) { //Where to find the last price of coin in JSON data
-    //         return new Promise(function (res, rej) {
-    //             try {
-    //                 data = data.result;
-    //                 for (let key in data) {
-    //                     let marketPair = key.split(':');
-    //                     let market = marketPair[0], pair = marketPair[1];
-    //                     let indexOfBTC = pair.indexOf('btc');
-    //                     if (indexOfBTC > 0 && !pair.includes('future') && !market.includes('qryptos') && !market.includes('quoine') && !market.includes('poloniex')) {
-    //                         if(marketNames.indexOf(market) === -1 ){
-    //                             marketNames.push([[market], ['']]);
-    //                             console.log(marketNames);
-    //                         }
-    //                         let coin = pair.replace(/btc/i, '').toUpperCase();
-    //                         let price = data[key].price.last;
-    //                         if(price > 0) {
-    //                             if (!coin_prices[coin]) coin_prices[coin] = {};
-    //                             coin_prices[coin][market] = price;
-    //
-    //                         }
-    //                     }
-    //                 }
-    //                 res(coin_prices);
-    //             }
-    //             catch (err) {
-    //                 console.log(err);
-    //                 rej(err)
-    //             }
-    //         })
-    //     }
-    //
-    // },
     {
         marketName: 'bittrex',
         URL: 'https://bittrex.com/api/v1.1/public/getmarketsummaries',
         toBTCURL: false,
         pairURL : '',
-        last: function (data, coin_prices) { //Where to find the last price of coin in JSON data
+        blacklist : [],
+        last: function (data, coin_prices, blacklist) { //Where to find the last price of coin in JSON data
             return new Promise(function (res, rej) {
                 try {
                     for (let obj of data.result) {
                         if(obj["MarketName"].includes('BTC-')) {
                             let coinName = obj["MarketName"].replace("BTC-", '');
+                            if (blacklist.includes(coinName))
+                                continue;
                             if (!coin_prices[coinName]) coin_prices[coinName] = {};
                             coin_prices[coinName].bittrex = obj.Last;
                         }
@@ -88,39 +28,13 @@ let markets = [
 
     },
 
-    /*{
-        marketName: 'btc38',
-        URL: 'http://api.btc38.com/v1/ticker.php?c=all&mk_type=cny',
-        toBTCURL: false,
-        pairURL : '',
-        last: function (data, coin_prices, toBTCURL) { //Where to find the last price of coin in JSON data
-            return new Promise(function (res, rej) {
-                let priceOfBTC = data.btc.ticker.last;
-                try {
-                    for (let key in data) {
-                        let coinName = key.toUpperCase();
-                        let price = data[key]['ticker'].last;
-                        if (!coin_prices[coinName]) coin_prices[coinName] = {};
-
-                        coin_prices[coinName]["btc38"] = data[key]['ticker'].last / priceOfBTC;
-                    }
-                    res(coin_prices);
-                }
-
-                catch (err) {
-                    console.log(err);
-                    rej(err)
-                }
-            })
-        }
-    },*/
 	{
         marketName: 'binance',
         URL: 'https://api.binance.com/api/v1/ticker/allPrices',
         toBTCURL: false,
         pairURL : '',
-        blacklist : ['<CoinName>'],
-        last: function (data, coin_prices) { //Where to find the last price of coin in JSON data
+        blacklist : [],
+        last: function (data, coin_prices, blacklist) { //Where to find the last price of coin in JSON data
             return new Promise(function (res, rej) {
                 try {
 					//console.log("hi this is the result2:\n" + JSON.stringify(data[0], null, 2));
@@ -128,6 +42,8 @@ let markets = [
 						//console.log("current coin:\n" + JSON.stringify(obj, null, 2));
                         if(obj["symbol"].includes('BTC')) {
                             let coinName = obj["symbol"].replace("BTC", '');
+                            if (blacklist.includes(coinName))
+                                continue;
                             if (!coin_prices[coinName]) coin_prices[coinName] = {};
                             coin_prices[coinName].binance = obj["price"];
                         }
@@ -146,13 +62,16 @@ let markets = [
         URL: 'https://bitgrail.com/api/v1/markets',
         toBTCURL: false,
         pairURL : '',
-        last: function (data, coin_prices) { //Where to find the last price of coin in JSON data
+        blacklist : ['LSK', 'CFT'],
+        last: function (data, coin_prices, blacklist) { //Where to find the last price of coin in JSON data
             return new Promise(function (res, rej) {
                 try {
 					//console.log("hi this is the result2:\n" + JSON.stringify(data[0], null, 2));
                     for (let obj of data['response']['BTC']) {
                         if(obj["market"].includes('/BTC')) {
                             let coinName = obj["market"].replace("/BTC", '');
+                            if (blacklist.includes(coinName))
+                                continue;
                             if (!coin_prices[coinName]) coin_prices[coinName] = {};
                             coin_prices[coinName].bitgrail = obj["last"];
                         }
@@ -174,13 +93,16 @@ let markets = [
         URL: 'https://api.kucoin.com/v1/market/open/symbols',
         toBTCURL: false,
         pairURL : '',
-        last: function (data, coin_prices) { //Where to find the last price of coin in JSON data
+        blacklist : ['BCD'],
+        last: function (data, coin_prices, blacklist) { //Where to find the last price of coin in JSON data
             return new Promise(function (res, rej) {
                 try {
 					//console.log("hi this is the result2:\n" + JSON.stringify(data[0], null, 2));
                     for (let obj of data['data']) {
                         if(obj["symbol"].includes('-BTC')) {
                             let coinName = obj["symbol"].replace("-BTC", '');
+                            if (blacklist.includes(coinName))
+                                continue;
                             if (!coin_prices[coinName]) coin_prices[coinName] = {};
                             coin_prices[coinName].kucoin = obj["lastDealPrice"];
                         }
@@ -198,41 +120,11 @@ let markets = [
     },
 
     /*{
-        marketName: 'jubi',
-        URL: 'https://www.jubi.com/api/v1/allticker/', //URL To Fetch API From.
-        toBTCURL: false, //URL, if needed for an external bitcoin price api.
-        pairURL : '',
-        last: function (data, coin_prices, toBTCURL) { //Where to find the last price of coin in JSON data
-            return new Promise(function (res, rej) {
-                let priceOfBTC = data.btc.last;
-                console.log(priceOfBTC);
-                try {
-                    for (let key in data) {
-                        let coinName = key.toUpperCase();
-                        let price = data[key].last;
-                        if (!coin_prices[coinName]) coin_prices[coinName] = {};
-
-                        coin_prices[coinName]["jubi"] = data[key].last / priceOfBTC;
-                    }
-                    res(coin_prices);
-                }
-
-                catch (err) {
-                    console.log(err);
-                    rej(err)
-                }
-            })
-        }
-
-    },
-
-
-    {
         marketName: 'poloniex',
         URL: 'https://poloniex.com/public?command=returnTicker',
         toBTCURL: false,
         pairURL : '',
-        last: function (data, coin_prices) { //Where to find the last price of coin in JSON data
+        last: function (data, coin_prices, blacklist) { //Where to find the last price of coin in JSON data
             return new Promise(function (res, rej) {
                 try {
                     for (var obj in data) {
@@ -259,12 +151,15 @@ let markets = [
 		URL: 'https://www.cryptopia.co.nz/api/GetMarkets/BTC', //URL To Fetch API From.
 		toBTCURL: false, //URL, if needed for an external bitcoin price api.
         pairURL : '',
-        last: function (data, coin_prices) { //Get the last price of coins in JSON data
+		blacklist : ['BTG', 'FUEL', 'PINK'],
+        last: function (data, coin_prices, blacklist) { //Get the last price of coins in JSON data
 			return new Promise(function (res, rej) {
 				try {
 					for (let obj of data.Data) {
 						if(obj["Label"].includes('/BTC')) {
-							let coinName = obj["Label"].replace("/BTC", '');
+                            let coinName = obj["Label"].replace("/BTC", '');
+                            if (blacklist.includes(coinName))
+                                continue;
 							if (!coin_prices[coinName]) coin_prices[coinName] = {};
 							coin_prices[coinName].cryptopia = obj.LastPrice;
                         }
@@ -279,42 +174,15 @@ let markets = [
 
             })
 		},
-	}/*,
-    
-    {
-		marketName: 'bleutrade',
-		URL: 'https://bleutrade.com/api/v2/public/getmarketsummaries', //URL To Fetch API From.
-		toBTCURL: false, //URL, if needed for an external bitcoin price api.
-        pairURL : '',
-        last: function (data, coin_prices) { //Get the last price of coins in JSON data
-			return new Promise(function (res, rej) {
-				try {
-					for (let obj of data.result) {
-						if(obj["MarketName"].includes('_BTC')) {
-							let coinName = obj["MarketName"].replace("_BTC", '');
-							if (!coin_prices[coinName]) coin_prices[coinName] = {};
-							coin_prices[coinName].bleutrade = obj.Last;
-                        }
-                    }
-                    res(coin_prices);
-					
-                }
-                catch (err) {
-                    console.log(err);
-                    rej(err);
-                }
-
-            })
-		},
-	},
+	}
 	
-	{
+	/*{
 
         marketName: 'kraken', // kraken has no one size fits all market summery so each pair has to be entered as param in GET - will need to add new coins as they are added to exchange
         URL: 'https://api.kraken.com/0/public/Ticker?pair=DASHXBT,EOSXBT,GNOXBT,ETCXBT,ETHXBT,ICNXBT,LTCXBT,MLNXBT,REPXBT,XDGXBT,XLMXBT,XMRXBT,XRPXBT,ZECXBT', //URL To Fetch API From.
         toBTCURL: false, //URL, if needed for an external bitcoin price api.
         pairURL : '',
-        last: function (data, coin_prices) { //Get the last price of coins in JSON data
+        last: function (data, coin_prices, blacklist) { //Get the last price of coins in JSON data
             return new Promise(function (res, rej) {
                 try {
                     for (let key in data.result) {
@@ -346,9 +214,9 @@ let markets = [
     },*/
 
 ];
-let blacklist=['LSK', 'BTG', 'CFT', 'BITB', 'GBYTE', 'MUSIC', 'PINK', 'FUEL', 'CMT', 'BCD']
+
 let marketNames = [];
-for(let i = 0; i < markets.length; i++) { // Loop except cryptowatch
+for(let i = 0; i < markets.length; i++) {
     marketNames.push([[markets[i].marketName], [markets[i].pairURL]]);
 }
 console.log("Markets:", marketNames);

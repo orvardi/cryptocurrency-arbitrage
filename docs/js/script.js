@@ -119,7 +119,7 @@ $(window).load(function () {
     let socket = io();
 
     let numberOfLoads = 0; //Number of final results loads
-    let numberOfMLoads = 0; //Number of Market loadss
+    let numberOfMLoads = 0; //Number of Market loads
 
 
     socket.on('coinsAndMarkets', function (data) { //Function for when we get market data

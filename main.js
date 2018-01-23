@@ -47,8 +47,7 @@ function getMarketData(options, coin_prices, callback) {   //GET JSON DATA
                 let data = JSON.parse(body);
                 console.log("Success", options.marketName);
                 if (options.marketName) {
-
-                    let newCoinPrices = options.last(data, coin_prices, options.toBTCURL);
+                    let newCoinPrices = options.last(data, coin_prices, options.blacklist);
                     numberOfRequests++;
                     if (numberOfRequests >= 1) computePrices(coin_prices);
                     resolve(newCoinPrices);
